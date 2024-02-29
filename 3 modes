@@ -1,0 +1,103 @@
+def pad(plaintext, block_size):
+    padding_length = block_size - len(plaintext) % block_size
+    padding = bytes([padding_length]) * padding_length
+    return plaintext + padding
+
+def unpad(padded_plaintext):
+    padding_length = padded_plaintext[-1]
+    return padded_plaintext[:-padding_length]
+
+def xor_bytes(a, b):
+    return bytes(x ^ y for x, y in zip(a, b))
+
+def encrypt_ecb(plaintext, key):
+    block_size = len(key)
+    padded_plaintext = pad(plaintext, block_size)
+    cipher_text = b''
+    for i in range(0, len(padded_plaintext), block_size):
+        block = padded_plaintext[i:i+block_size]
+        encrypted_block = xor_bytes(block, key)
+        cipher_text += encrypted_block
+    return cipher_text
+
+def decrypt_ecb(ciphertext, key):
+    block_size = len(key)
+    plain_text = b''
+    for i in range(0, len(ciphertext), block_size):
+        block = ciphertext[i:i+block_size]
+        decrypted_block = xor_bytes(block, key)
+        plain_text += decrypted_block
+    return unpad(plain_text)
+
+def encrypt_cbc(plaintext, key, iv):
+    block_size = len(key)
+    padded_plaintext = pad(plaintext, block_size)
+    cipher_text = b''
+    prev_block = iv
+    for i in range(0, len(padded_plaintext), block_size):
+        block = padded_plaintext[i:i+block_size]
+        block_xor = xor_bytes(block, prev_block)
+        encrypted_block = xor_bytes(block_xor, key)
+        cipher_text += encrypted_block
+        prev_block = encrypted_block
+    return cipher_text
+
+def decrypt_cbc(ciphertext, key, iv):
+    block_size = len(key)
+    plain_text = b''
+    prev_block = iv
+    for i in range(0, len(ciphertext), block_size):
+        block = ciphertext[i:i+block_size]
+        decrypted_block = xor_bytes(block, key)
+        plain_text += xor_bytes(decrypted_block, prev_block)
+        prev_block = block
+    return unpad(plain_text)
+
+def encrypt_cfb(plaintext, key, iv):
+    block_size = len(key)
+    cipher_text = b''
+    prev_block = iv
+    for char in plaintext:
+        encrypted_block = xor_bytes(prev_block, key)
+        cipher_text += xor_bytes(encrypted_block, bytes([char]))
+        prev_block = encrypted_block
+    return cipher_text
+
+def decrypt_cfb(ciphertext, key, iv):
+    block_size = len(key)
+    plain_text = b''
+    prev_block = iv
+    for char in ciphertext:
+        encrypted_block = xor_bytes(prev_block, key)
+        plain_text += bytes([char]) ^ encrypted_block[0:1]
+        prev_block = encrypted_block
+    return plain_text
+
+# Example usage:
+key = b'abcdefghabcdefgh'  # 16 bytes key
+iv = b'ijklmnopqrstuvwx'   # 16 bytes IV
+plaintext = b'This is a secret message'
+
+# ECB mode
+ecb_cipher_text = encrypt_ecb(plaintext, key)
+ecb_plain_text = decrypt_ecb(ecb_cipher_text, key)
+
+# CBC mode
+cbc_cipher_text = encrypt_cbc(plaintext, key, iv)
+cbc_plain_text = decrypt_cbc(cbc_cipher_text, key, iv)
+
+# CFB mode
+cfb_cipher_text = encrypt_cfb(plaintext, key, iv)
+cfb_plain_text = decrypt_cfb(cfb_cipher_text, key, iv)
+
+print("ECB Mode:")
+print("Encrypted:", ecb_cipher_text)
+print("Decrypted:", ecb_plain_text)
+
+print("\nCBC Mode:")
+print("Encrypted:", cbc_cipher_text)
+print("Decrypted:", cbc_plain_text)
+
+print("\nCFB Mode:")
+print("Encrypted:", cfb_cipher_text)
+print("Decrypted:", cfb_plain_text)
