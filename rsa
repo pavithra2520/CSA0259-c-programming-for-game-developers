@@ -1,0 +1,28 @@
+from math import gcd
+
+def decrypt(ciphertext, e, n):
+    plaintext = [chr(pow(c, e, n)) for c in ciphertext]
+    return ''.join(plaintext)
+
+def main():
+    # Given public key
+    e = 65537
+    n = 3599  # Just an example, normally n would be a product of two large primes
+
+    # Ciphertext blocks
+    ciphertext_blocks = [2734, 1234, 2039]
+
+    # Decrypt the ciphertext blocks (assuming we don't have the private key)
+    decrypted_blocks = [decrypt([block], e, n) for block in ciphertext_blocks]
+    print("Decrypted Blocks:", decrypted_blocks)
+
+    # Check if any plaintext block has a common factor with n
+    for block in decrypted_blocks:
+        if gcd(n, ord(block)) != 1:
+            print("One plaintext block has a common factor with n.")
+            break
+    else:
+        print("None of the plaintext blocks have a common factor with n.")
+
+if _name_ == "_main_":
+    main()
