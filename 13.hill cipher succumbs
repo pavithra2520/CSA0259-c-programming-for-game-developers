@@ -1,0 +1,34 @@
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+def mod_inverse(a, m):
+    for x in range(1, m):
+        if (a * x) % m == 1:
+            return x
+    return None
+
+def hill_decrypt(ciphertext, key):
+    a, b, c, d = key[0], key[1], key[2], key[3]
+    inv_det = mod_inverse(a*d - b*c, 26)
+    if inv_det is None:
+        return "Error: Key is not invertible"
+    decrypted = ""
+    for char in ciphertext:
+        if char.isalpha():
+            num = ord(char) - ord('A')
+            x = (inv_det * (d*num - (-b)*num)) % 26
+            y = (inv_det * ((-c)*num + a*num)) % 26
+            decrypted += chr(x + ord('A')) + chr(y + ord('A'))
+        else:
+            decrypted += char
+    return decrypted
+
+if _name_ == "_main_":
+    plaintext = "HELLO"
+    ciphertext = "PJYYV"
+    key = [7, 8, 11, 11]  # Example key
+
+    decrypted_text = hill_decrypt(ciphertext, key)
+    print("Decrypted Text:", decrypted_text)
