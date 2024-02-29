@@ -1,0 +1,26 @@
+def generate_cipher_alphabet(keyword):
+    keyword = keyword.upper()
+    cipher_alphabet = list(keyword)
+    for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        if letter not in cipher_alphabet:
+            cipher_alphabet.append(letter)
+    return ''.join(cipher_alphabet)
+
+def monoalphabetic_cipher(plaintext, keyword):
+    plaintext = plaintext.upper()
+    cipher_alphabet = generate_cipher_alphabet(keyword)
+    cipher_text = ''
+    for char in plaintext:
+        if char.isalpha():
+            index = ord(char) - ord('A')
+            cipher_text += cipher_alphabet[index]
+        else:
+            cipher_text += char
+    return cipher_text
+
+# Example usage:
+keyword = 'CIPHER'
+plaintext = 'Hello, world!'
+cipher_text = monoalphabetic_cipher(plaintext, keyword)
+print("Plaintext:", plaintext)
+print("Ciphertext:", cipher_text)
