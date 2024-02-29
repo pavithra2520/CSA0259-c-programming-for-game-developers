@@ -1,0 +1,46 @@
+def xor_bytes(a, b):
+    return bytes(x ^ y for x, y in zip(a, b))
+
+def encrypt_3des_cbc(plaintext, key1, key2, key3, iv):
+    block_size = 8
+    cipher_text = b''
+    prev_block = iv
+    for block in [plaintext[i:i+block_size] for i in range(0, len(plaintext), block_size)]:
+        encrypted_block = xor_bytes(block, key1)
+        encrypted_block = xor_bytes(encrypted_block, key2)
+        encrypted_block = xor_bytes(encrypted_block, key3)
+        encrypted_block = xor_bytes(encrypted_block, prev_block)
+        cipher_text += encrypted_block
+        prev_block = encrypted_block
+    return cipher_text
+
+def decrypt_3des_cbc(ciphertext, key1, key2, key3, iv):
+    block_size = 8
+    plain_text = b''
+    prev_block = iv
+    for block in [ciphertext[i:i+block_size] for i in range(0, len(ciphertext), block_size)]:
+        decrypted_block = xor_bytes(block, key1)
+        decrypted_block = xor_bytes(decrypted_block, key2)
+        decrypted_block = xor_bytes(decrypted_block, key3)
+        decrypted_block = xor_bytes(decrypted_block, prev_block)
+        plain_text += decrypted_block
+        prev_block = block
+    return plain_text
+
+# Example usage:
+key1 = b'abcdefgh'  # 8 bytes key
+key2 = b'ijklmnop'  # 8 bytes key
+key3 = b'qrstuvwx'  # 8 bytes key
+iv = b'12345678'    # 8 bytes IV
+plaintext = b'This is a secret message'
+
+# Encrypt using CBC mode with 3DES
+cbc_3des_cipher_text = encrypt_3des_cbc(plaintext, key1, key2, key3, iv)
+
+# Decrypt using CBC mode with 3DES
+cbc_3des_plain_text = decrypt_3des_cbc(cbc_3des_cipher_text, key1, key2, key3, iv)
+
+print("CBC Mode with 3DES:")
+print("Original Plaintext:", plaintext)
+print("Encrypted:", cbc_3des_cipher_text)
+print("Decrypted:", cbc_3des_plain_text)
