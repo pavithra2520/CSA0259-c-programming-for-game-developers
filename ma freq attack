@@ -1,0 +1,36 @@
+def decrypt(ciphertext, key):
+    decrypted_text = ''
+    for char in ciphertext:
+        if char.isalpha():
+            if char.islower():
+                decrypted_text += chr((ord(char) - ord('a') + key) % 26 + ord('a'))
+            else:
+                decrypted_text += chr((ord(char) - ord('A') + key) % 26 + ord('A'))  
+        else:
+            decrypted_text += char
+    return decrypted_text
+
+def calculate_letter_frequency(text):
+    letter_count = {char: text.count(char) for char in 'abcdefghijklmnopqrstuvwxyz'}
+    total_letters = sum(letter_count.values())
+    letter_frequency = {char: count / total_letters for char, count in letter_count.items()}
+    return letter_frequency
+
+def monoalphabetic_cipher_attack(ciphertext, top_n=10):
+    possible_plaintexts = []
+    for key in range(26):
+        decrypted_text = decrypt(ciphertext, -key)  # Attempting all possible keys
+        letter_frequency = calculate_letter_frequency(decrypted_text.lower())
+        possible_plaintexts.append((decrypted_text, letter_frequency))
+    return sorted(possible_plaintexts, key=lambda x: sum(x[1].values()), reverse=True)[:top_n]
+
+def main():
+    ciphertext = input("Enter the ciphertext: ")
+    top_n = int(input("Enter the number of top possible plaintexts to display: "))
+    possible_plaintexts = monoalphabetic_cipher_attack(ciphertext, top_n)
+    print("\nTop", top_n, "possible plaintexts:")
+    for i, (plaintext, _) in enumerate(possible_plaintexts, 1):
+        print(f"{i}. {plaintext}")
+
+if __name__ == "__main__":
+    main()
