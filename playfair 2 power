@@ -1,0 +1,23 @@
+def playfair_key_count():
+    total_keys = 1
+    for i in range(25, 20, -1):
+        total_keys *= i
+    return total_keys
+
+def keys_as_power_of_2(keys):
+    power_of_2 = 0
+    while keys > 1:
+        keys /= 2
+        power_of_2 += 1
+    return power_of_2
+
+def main():
+    try:
+        keys = playfair_key_count()
+        power_of_2 = keys_as_power_of_2(keys)
+        print("Approximate number of possible keys for Playfair cipher as a power of 2:", power_of_2)
+    except Exception as e:
+        print("An error occurred:", e)
+
+if _name_ == "_main_":
+    main()
