@@ -1,0 +1,27 @@
+def decrypt(ciphertext, shift):
+    decrypted_text = ''
+    for char in ciphertext:
+        if char.isalpha():
+            base = ord('a') if char.islower() else ord('A')
+            decrypted_text += chr((ord(char) - base - shift) % 26 + base)
+        else:
+            decrypted_text += char
+    return decrypted_text
+
+def letter_frequency_attack(ciphertext, top_n=10):
+    possible_plaintexts = []
+    for shift in range(26):
+        decrypted_text = decrypt(ciphertext, shift)
+        possible_plaintexts.append((decrypted_text, decrypted_text.lower().count('e')))
+    return sorted(possible_plaintexts, key=lambda x: x[1], reverse=True)[:top_n]
+
+def main():
+    ciphertext = input("Enter the ciphertext: ")
+    top_n = int(input("Enter the number of top possible plaintexts to display: "))
+    possible_plaintexts = letter_frequency_attack(ciphertext, top_n)
+    print("\nTop", top_n, "possible plaintexts:")
+    for i, (plaintext, _) in enumerate(possible_plaintexts, 1):
+        print(f"{i}. {plaintext}")
+
+if __name__ == "__main__":
+    main()
