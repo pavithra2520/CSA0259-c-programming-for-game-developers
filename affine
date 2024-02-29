@@ -1,0 +1,44 @@
+def break_affine_cipher(frequent_letters):
+    # Assign indices for the most frequent and second most frequent letters
+    idx1 = ord(frequent_letters[0]) - ord('B')  # 'B' is the most frequent letter
+    idx2 = ord(frequent_letters[1]) - ord('U')  # 'U' is the second most frequent letter
+
+    # Find the modular inverse of idx1
+    a = mod_inverse(idx1, 26)
+    if a is None:
+        return None, None
+    # Find b using the equation b = (idx2 - a * idx1) % 26
+    b = (idx2 - a * idx1) % 26
+    return a, b
+
+
+def decrypt_affine_cipher(ciphertext, a, b):
+    plaintext = ''
+    for c in ciphertext:
+        if c.isalpha():
+            idx = ord(c.lower()) - ord('a')
+            # Decrypt using the inverse transformation
+            idx = ((idx - b) * mod_inverse(a, 26)) % 26
+            plaintext += chr(idx + ord('a'))
+        else:
+            plaintext += c
+    return plaintext
+
+
+# Given information about the most frequent and second most frequent letters
+frequent_letters = ['B', 'U']
+
+# Break the affine cipher
+a, b = break_affine_cipher(frequent_letters)
+if a is not None:
+    print("a:", a)
+    print("b:", b)
+
+    # Example ciphertext
+    ciphertext = "KXJEY UREBE ZWEHE WRYTU HEYFS KREHE GOYFI WTTTU OLKSY CAJPO BOTEI ZONTX BYBNT GONEY CUZWR GDSON SXBOU YWRHE BAAHY USEDQ"
+
+    # Decrypt the ciphertext
+    plaintext = decrypt_affine_cipher(ciphertext, a, b)
+    print("Plaintext:", plaintext)
+else:
+    print("Unable to break the affine cipher.")
